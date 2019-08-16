@@ -29,7 +29,7 @@
 
 # Usage:
 
-#   symlink-all.sh <basedir> <logfile> <ignore> <unisrc> <component1> \
+#   symlink-all.sh <basedir> <logfile> <unisrc> <component1> \
 #                  <component2> ...
 
 # The <unisrc> directory is assumed to exist. symlink-tree is run in that
@@ -88,8 +88,7 @@ basedir="$1"
 shift
 logfile="$1"
 shift
-always_ignore="$1"
-shift
+always_ignore=""
 
 # Change to the unisrc directory, which can be relative to the base directory.
 unisrc_dir=$1

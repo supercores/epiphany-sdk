@@ -84,11 +84,6 @@
 #                          [--auto-pull | --no-auto-pull]
 #                          [--auto-checkout | --no-auto-checkout]
 #                          [--jobs <count>] [--load <load>] [--single-thread]
-#                          [--gmp | --no-gmp]
-#                          [--mpfr | --no-mpfr]
-#                          [--mpc | --no-mpc]
-#                          [--isl | --no-isl]
-#                          [--cloog | --no-cloog]
 #                          [--target-cflags <flags>]
 #                          [--config-extra <flags>]
 #                          [--disable-werror | --enable-werror]
@@ -232,31 +227,6 @@
 #     Equivalent to --jobs 1 --load 1000. Only run one job at a time, but run
 #     whatever the load average.
 
-# --gmp | --no-gmp
-# --mpfr | --no-mpfr
-# --mpc | --no-mpc
-# --isl | --no-isl
-# --cloog | --no-cloog
-# --ncurses | --no-ncurses
-
-#     Indicate that the corresponding GCC infrastructure component exists as a
-#     source directory within the base directory and should be linked into the
-#     unified source directory.  With the "--no-" versions, indicate the
-#     component is not available as a source directory, and that the compiler
-#     should rely on the installed developer package for the relevant headers
-#     and libraries.
-
-#     Note that in this case it is the *developer* version of the package that
-#     must be installed.  Specifiying --no-gmp, --no-mpfr or --no-mpc if the
-#     corresponding developer package is not available will cause tool chain
-#     building to fail. Specifying --no-isl or --no-cloog when the developer
-#     package is not available will cause some GCC optimizatiosn to be
-#     omitted.  Specifying --no-ncurses when the developer cross-compiled
-#     package is not available will cause a Canadian Cross build (i.e. with
-#     different build and host architectures) to fail.
-
-#     Defaults --gmp --mpfr --mpc --isl --cloog --ncurses.
-
 # --expat | --no-expat
 
 #     Indicate that the corresponding GDB infrastructure component exists as a
@@ -348,17 +318,9 @@ auto_pull="--auto-pull"
 auto_checkout="--auto-checkout"
 rebuild_unisrc="--preserve-unisrc"
 unisrc_dir=${basedir}/unisrc-${RELEASE}
+infra_dir="gcc-infrastructure"
 jobs=
 load=
-# TODO: Get rid of all these flags. If you don't want something comment out the
-# line in the components file.
-do_gmp="--gmp"
-do_mpfr="--mpfr"
-do_mpc="--mpc"
-do_isl="--isl"
-do_cloog="--no-cloog"
-do_ncurses="--ncurses"
-do_expat="--expat"
 
 # The assembler and/or linker are broken so that constant merging doesn't
 # work.
@@ -466,34 +428,6 @@ case ${opt} in
 	load=1000
 	;;
 
-    --gmp | --no-gmp)
-	do_gmp="$1"
-	;;
-
-    --mpfr | --no-mpfr)
-	do_mpfr="$1"
-	;;
-
-    --mpc | --no-mpc)
-	do_mpc="$1"
-	;;
-
-    --isl | --no-isl)
-	do_isl="$1"
-	;;
-
-    --cloog | --no-cloog)
-	do_cloog="$1"
-	;;
-
-    --ncurses | --no-ncurses)
-	do_ncurses="$1"
-	;;
-
-    --expat | --no-expat)
-	do_expat="$1"
-	;;
-
     --target-cflags)
 	shift
 	CFLAGS_FOR_TARGET="$1"
@@ -532,13 +466,6 @@ case ${opt} in
         echo "             [--auto-pull | --no-auto-pull]"
         echo "             [--auto-checkout | --no-auto-checkout]"
         echo "             [--jobs <count>] [--load <load>] [--single-thread]"
-        echo "             [--gmp | --no-gmp]"
-        echo "             [--mpfr | --no-mpfr]"
-        echo "             [--mpc | --no-mpc]"
-        echo "             [--isl | --no-isl]"
-        echo "             [--cloog | --no-cloog]"
-        echo "             [--ncurses | --no-ncurses]"
-        echo "             [--expat | --no-expat]"
         echo "             [--target-cflags <flags>]"
         echo "             [--config-extra <flags>]"
         echo "             [--disable-werror | --enable-werror]"
@@ -687,13 +614,6 @@ logonly "Rebuild unified source:         ${rebuild_unisrc}"
 logonly "Unified source directory:       ${unisrc_dir}"
 logonly "Maximum jobs:                   ${jobs}"
 logonly "Maximum load:                   ${load}"
-logonly "Use GMP source:                 ${do_gmp}"
-logonly "Use MPFR source:                ${do_mpfr}"
-logonly "Use MPC source:                 ${do_mpc}"
-logonly "Use ISL source:                 ${do_isl}"
-logonly "Use Cloog source:               ${do_cloog}"
-logonly "Use ncurses source:             ${do_ncurses}"
-logonly "Use expat source:               ${do_expat}"
 logonly "Target CFLAGS:                  ${CFLAGS_FOR_TARGET}"
 logonly "Target CXXFLAGS:                ${CXXFLAGS_FOR_TARGET}"
 logonly "CFLAGS:                         ${CFLAGS}"
@@ -730,88 +650,12 @@ else
     host_str=""
 fi
 
-# Sanity check that we have everything we need. Take the opportunity to set up
-# the component lists at the same time. Note that later items in the list
-# override earlier items.
-res="success"
+# Check if required components exist, which we *must* have.
+check_dir_exists "gcc"  && check_dir_exists "binutils" && \
+check_dir_exists "gdb"  && check_dir_exists "newlib"   && \
+check_dir_exists "sdk" || failedbuild
 
-# First the main components, which we *must* have.
-check_dir_exists "gcc"      || res="failure"
-check_dir_exists "binutils" || res="failure"
-check_dir_exists "gdb"      || res="failure"
-check_dir_exists "newlib"   || res="failure"
-check_dir_exists "cgen"     || res="failure"
-check_dir_exists "sdk"      || res="failure"
-
-component_dirs="newlib gdb binutils cgen gcc"
-
-# Optional GCC infrastructure components
-infra_dir=""
-infra_exclude=""
-
-if [ "${do_gmp}" = "--gmp" ]
-then
-    check_dir_exists "gcc-infrastructure/gmp" || res="failure"
-    infra_dir="gcc-infrastructure"
-else
-    infra_exclude="gmp ${infra_exclude}"
-fi
-
-if [ "${do_mpfr}" = "--mpfr" ]
-then
-    check_dir_exists "gcc-infrastructure/mpfr" || res="failure"
-    infra_dir="gcc-infrastructure"
-else
-    infra_exclude="mpfr ${infra_exclude}"
-fi
-
-if [ "${do_mpc}" = "--mpc" ]
-then
-    check_dir_exists "gcc-infrastructure/mpc" || res="failure"
-    infra_dir="gcc-infrastructure"
-else
-    infra_exclude="mpc ${infra_exclude}"
-fi
-
-if [ "${do_isl}" = "--isl" ]
-then
-    check_dir_exists "gcc-infrastructure/isl" || res="failure"
-    infra_dir="gcc-infrastructure"
-else
-    infra_exclude="isl ${infra_exclude}"
-fi
-
-if [ "${do_cloog}" = "--cloog" ]
-then
-    check_dir_exists "gcc-infrastructure/cloog" || res="failure"
-    infra_dir="gcc-infrastructure"
-else
-    infra_exclude="cloog ${infra_exclude}"
-fi
-
-if [ "${do_ncurses}" = "--ncurses" ]
-then
-    check_dir_exists "gcc-infrastructure/ncurses" || res="failure"
-    infra_dir="gcc-infrastructure"
-else
-    infra_exclude="ncurses ${infra_exclude}"
-fi
-
-if [ "${do_expat}" = "--expat" ]
-then
-    check_dir_exists "gcc-infrastructure/expat" || res="failure"
-    infra_dir="gcc-infrastructure"
-else
-    infra_exclude="expat ${infra_exclude}"
-fi
-
-
-if [ "${res}" != "success" ]
-then
-    failedbuild
-fi
-
-component_dirs="${infra_dir} ${component_dirs}"
+component_dirs="${infra_dir} newlib gdb binutils cgen gcc"
 
 regex="toolchain"
 # Checkout and pull repos if necessary
@@ -873,7 +717,7 @@ then
 
   logterm "Creating unified source tree..."
   if ! ${basedir}/sdk/symlink-all.sh "${basedir}" "${logfile}" \
-           "${infra_exclude}" "${unisrc_dir}" "${component_dirs}"
+            "${unisrc_dir}" "${component_dirs}"
   then
       logterm "ERROR: Failed to build unified source tree in ${unisrc_dir}."
       failedbuild
@@ -1003,7 +847,7 @@ then
 
     # We also first build ncurses in the case of cross compilation such a
     # suitable termcap library is available for GDB.
-    if [ "${do_ncurses}" = "--ncurses" ]
+    if check_dir_exists "gcc-infrastructure/ncurses"
     then
 	bd_ncurses="${bd_host}-ncurses"
 	rm -rf "${bd_ncurses}"
@@ -1041,10 +885,9 @@ then
 	fi
 
     fi
-
     # We also first build expat in the case of cross compilation so a
     # suitable XML library is available for GDB.
-    if [ "${do_expat}" = "--expat" ]
+    if check_dir_exists "gcc-infrastructure/expat"
     then
 	bd_expat="${bd_host}-expat"
 	rm -rf "${bd_expat}"
