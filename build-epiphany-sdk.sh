@@ -105,7 +105,6 @@ while getopts c:e:Cdj:r:Rt:h arg; do
 		echo "    ESDK_BUILDROOT"
 		echo "    ESDK_BUILD_TOOLCHAIN"
 		echo "    ESDK_DESTDIR"
-		echo "    PARALLELLA_LINUX_HOME"
 		echo ""
 		exit 0
 		;;
