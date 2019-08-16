@@ -242,13 +242,9 @@ fi
 
 if [ "$ESDK_BUILD_TOOLCHAIN" != "no" ]; then
 	# Build the toolchain (this will take a while)
-	# TODO: Remove --enable-cgen-maint and --enable-werror
-	# before we release.
 	if ! ./build-toolchain.sh ${jobs_str} \
 		--install-dir-host ${GNU} \
 		--destdir ${ESDK_DESTDIR} \
-		--disable-werror \
-		--enable-cgen-maint \
 		${buildarch_install_dir_str} \
 		${host_str} ${toolchain_clean_str}; then
 		printf "The toolchain build failed!\n"
