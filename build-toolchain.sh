@@ -735,6 +735,53 @@ fi
 # Ensure the staging directory exists.
 mkdir -p "$staging_host"
 
+# Force guile 1.8 in build if available or build it.
+force_guile_18_at() {
+    build_dir="$1"
+    if [ -d "${unisrc_dir}/guile" ]
+    then
+        bd_guile="${basedir}/builds/bd-guile"
+        mkdir -p "${bd_guile}"; cd "${bd_guile}"
+        if ! configure_success
+        then
+            logterm "Configuring guile-1.8..."
+            if ! "${unisrc_dir}/guile/configure" \
+                --disable-error-on-warning \
+                >> "${logfile}" 2>&1
+            then
+                logterm "ERROR: guile-1.8 configure failed."
+                failedbuild
+            fi
+        fi
+        if [ ! -f build_success ]
+        then
+            logterm "Building guile-1.8..."
+            if ! make ${parallel} >> "${logfile}" 2>&1
+            then
+                logterm "ERROR: guile-1.8 build failed."
+                failedbuild
+            fi
+            touch build_success
+        fi
+        if [ ! -h "${build_dir}/guile" ]
+        then
+            ln -s "${bd_guile}" "${build_dir}/guile"
+        fi
+    else
+       guile_dir="${build_dir}/guile/libguile"
+       if [ ! -h "${guile_dir}/guile" ]
+       then
+           guile18=`which guile1.8 2>/dev/null`
+           [ "x$guile18" = x ] && guile18=`which guile-1.8 2>/dev/null`
+           if ! [ "x${guile18}" = "x" ]
+           then
+               mkdir -p "${guile_dir}"
+               ln -sf ${guile18} "${guile_dir}/guile"
+           fi
+       fi
+    fi
+    cd "${build_dir}"
+}
 ################################################################################
 #                                                                              #
 #   Make sure we have an epiphany tool chain on the build machine if needed    #
@@ -762,15 +809,8 @@ then
 	rm -rf "${bd_build}"
         mkdir -p "${bd_build}"; cd ${bd_build}
 
-	# Force guile 1.8 in build if available.
-	guile18=`which guile1.8 2>/dev/null`
-	[ "x$guile18" = x ] && guile18=`which guile-1.8 2>/dev/null`
-	if ! [ "x${guile18}" = "x" ]
-	then
-	    mkdir -p guile/libguile
-	    ln -sf ${guile18} guile/libguile/guile
-	fi
-	unset guile18
+        # Force guile 1.8 in build if available or build it.
+        force_guile_18_at "${bd_build}"
 
         # Configure the required components of the tool chain. We only need
         # binutils, as, ld and gcc. We need to temporarily move
@@ -905,15 +945,8 @@ fi
 # Ensure the build directory exists. We build in the host build directory.
 mkdir -p "${bd_host}"; cd "${bd_host}"
 
-# Force guile 1.8 in build if available.
-guile18=`which guile1.8 2>/dev/null`
-[ "x$guile18" = x ] && guile18=`which guile-1.8 2>/dev/null`
-if ! [ "x${guile18}" = "x" ]
-then
-    mkdir -p guile/libguile
-    ln -sf ${guile18} guile/libguile/guile
-fi
-unset guile18
+# Force guile 1.8 in build if available or build it.
+force_guile_18_at "${bd_host}"
 
 # Configure the entire tool chain, but only if we are doing a clean build
 
