@@ -16,6 +16,12 @@ To cross compile execute:
 sdk/build-epiphany-sdk.sh -c arm-linux-gnueabihf
 ```
 
+or use the convenience wrapper:
+
+```
+./build-cross-esdk
+```
+
 ## Release information
 
 Releases are versioned according to the following abstraction with unique
