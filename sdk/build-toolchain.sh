@@ -924,14 +924,14 @@ fi
 if [ ! -f build_success ]
 then
     logterm "Building expat for host..."
-	if ! make ${parallel} buildlib >> "${logfile}" 2>&1
+    if ! make ${parallel} -C lib all >> "${logfile}" 2>&1
 	then
 	    logterm "ERROR: Unable to build expat for host"
 	    failedbuild
 	fi
     touch build_success
 fi
-	if ! make installlib >> "${logfile}" 2>&1
+	if ! make install >> "${logfile}" 2>&1
 	then
 	    logterm "ERROR: Unable to install expat for host"
 	    failedbuild
