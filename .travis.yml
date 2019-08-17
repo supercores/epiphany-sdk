@@ -39,8 +39,6 @@ before_install:
       guile-1.8
 
 script:
-    - mkdir -p sdk
-    - mv * .* sdk || true
     - ./sdk/download-components.sh --download
     - ./sdk/.travis.sh
 

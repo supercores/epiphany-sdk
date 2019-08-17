@@ -27,7 +27,7 @@ unset LD
 unset AS
 unset CXX
 unset CPP
-./sdk/build-epiphany-sdk.sh -j 2
+./sdk/build-epiphany-sdk.sh -j 2 -c arm-linux-gnueabihf 
 
 # The build finished without returning an error so dump a tail of the output
 dump_output
