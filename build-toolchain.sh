@@ -729,6 +729,7 @@ then
       failedbuild
     fi
   done
+  autoreconf -i --force "${unisrc_dir}/guile" >> "${logfile}" 2>&1
 fi
 
 

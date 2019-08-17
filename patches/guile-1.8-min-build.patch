@@ -1,0 +1,42 @@
+--- a/guile/configure.in	2010-12-13 19:24:39.000000000 +0200
++++ b/guile/configure.in	2019-07-29 00:35:45.404141420 +0200
+@@ -60,4 +59,0 @@
+-AC_CONFIG_SUBDIRS(guile-readline)
+-
+-#--------------------------------------------------------------------
+-
+@@ -1559,9 +1554,0 @@
+-  am/Makefile
+-  benchmark-suite/Makefile
+-  doc/Makefile
+-  doc/goops/Makefile
+-  doc/r5rs/Makefile
+-  doc/ref/Makefile
+-  doc/tutorial/Makefile
+-  emacs/Makefile
+-  examples/Makefile
+@@ -1570 +1556,0 @@
+-  lang/Makefile
+@@ -1572,6 +1557,0 @@
+-  oop/Makefile
+-  oop/goops/Makefile
+-  scripts/Makefile
+-  srfi/Makefile
+-  test-suite/Makefile
+-  test-suite/standalone/Makefile
+@@ -1582 +1561,0 @@
+-AC_CONFIG_FILES([benchmark-guile], [chmod +x benchmark-guile])
+@@ -1594,4 +1572,0 @@
+-AC_CONFIG_FILES([test-suite/standalone/test-use-srfi],
+-                [chmod +x test-suite/standalone/test-use-srfi])
+-AC_CONFIG_FILES([test-suite/standalone/test-fast-slot-ref],
+-                [chmod +x test-suite/standalone/test-fast-slot-ref])
+--- a/guile/Makefile.am	2010-12-13 19:24:38.000000000 +0200
++++ b/guile/Makefile.am	2019-07-29 00:36:15.196197986 +0200
+@@ -27,2 +27 @@
+-SUBDIRS = oop libguile ice-9 guile-config guile-readline emacs \
+-	  scripts srfi doc examples test-suite benchmark-suite lang am
++SUBDIRS = libguile ice-9 guile-config
+@@ -36,2 +34,0 @@
+-
+-TESTS = check-guile
