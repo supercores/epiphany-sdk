@@ -42,7 +42,7 @@
 #   <year>.<month>[.<patch>]
 RELEASE_MAJOR="2019"
 RELEASE_MINOR="8"
-RELEASE_PATCH=".gcc5"
+RELEASE_PATCH=".gcc8"
 
 # The full release version
 RELEASE="${RELEASE_MAJOR}.${RELEASE_MINOR}${RELEASE_PATCH}"
