@@ -8,6 +8,8 @@
 
 # @param[in] $1  The directory to make absolute if necessary.
 absdir() {
+    if ! realpath "${1}" 2> /dev/null
+    then
     case ${1} in
 
 	/*)
@@ -18,6 +20,7 @@ absdir() {
 	    echo "${PWD}/${1}"
 	    ;;
     esac
+    fi
 }
 
 
