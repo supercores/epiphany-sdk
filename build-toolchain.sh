@@ -578,7 +578,7 @@ then
     # No parallelism if memory is small.
     make_load=1
 else
-    make_load="`(echo processor; cat /proc/cpuinfo 2>/dev/null || echo processor) \
+    make_load="`(cat /proc/cpuinfo 2>/dev/null || echo processor) \
            | grep -c processor`"
 fi
 
