@@ -873,8 +873,9 @@ then
     then
 	bd_ncurses="${bd_host}-ncurses"
         mkdir -p "${bd_ncurses}"; cd "${bd_ncurses}"
+        if ! configure_success
 	then
-	logterm "Building ncurses for host..."
+            logterm "Configuring ncurses for host..."
 	if ! "${unisrc_dir}/ncurses/configure" ${host_str} --prefix="${staging_host}" \
 	    --without-progs --without-ada --without-manpages --without-tests \
 	    --with-abi-version=5 --with-shared \
@@ -884,11 +885,17 @@ then
 	    logterm "ERROR: Unable to configure ncurses for host"
 	    failedbuild
 	fi
+    fi
+    if [ ! -f build_success ]
+    then
+        logterm "Building ncurses for host..."
 	if ! make ${parallel} >> "${logfile}" 2>&1
 	then
 	    logterm "ERROR: Unable to build ncurses for host"
 	    failedbuild
 	fi
+        touch build_success
+    fi
 
 	if ! make install.libs install.includes >> "${logfile}" 2>&1
 	then
@@ -904,20 +911,26 @@ then
 	bd_expat="${bd_host}-expat"
     mkdir -p "${bd_expat}"; cd "${bd_expat}"
 
-	logterm "Building expat for host..."
+    if ! configure_success
+    then
+        logterm "Configuring expat for host..."
 	if ! "${unisrc_dir}/expat/configure" ${host_str} --prefix="${staging_host}" \
-	    >> "${logfile}" 2>&1
+            --without-xmlwf >> "${logfile}" 2>&1
 	then
 	    logterm "ERROR: Unable to configure expat for host"
 	    failedbuild
 	fi
-
+fi
+if [ ! -f build_success ]
+then
+    logterm "Building expat for host..."
 	if ! make ${parallel} buildlib >> "${logfile}" 2>&1
 	then
 	    logterm "ERROR: Unable to build expat for host"
 	    failedbuild
 	fi
-
+    touch build_success
+fi
 	if ! make installlib >> "${logfile}" 2>&1
 	then
 	    logterm "ERROR: Unable to install expat for host"
@@ -954,8 +967,6 @@ force_guile_18_at "${bd_host}"
 export CFLAGS_FOR_TARGET
 export CXXFLAGS_FOR_TARGET
 
-# @todo Should we enable Python support in GDB? If so do we need to check
-#       Python is available?
 if [ ${do_clean_host} = "--clean-host" ]
 then
     logterm "Configuring tool chain..."

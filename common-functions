@@ -101,4 +101,7 @@ failedbuild () {
 }
 
 
-
+# Check configure successful
+configure_success() {
+    tail -1 config.log 2> /dev/null | grep -q 'exit 0'
+}
