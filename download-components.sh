@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Copyright (C) 2013,2014 Embecosm Limited
 
@@ -80,8 +80,6 @@
 
 # Function to clone a git repository, checking out the relevant branch.
 
-# The cloned repository will name its remote "adapteva".
-
 # @param[in] $1  The tool to clone
 # @param[in] $2  The full repository URL
 # @param[in] $3  The branch to checkout
@@ -106,7 +104,7 @@ clone_tool() {
     if [ ! -e ${tool} ]
     then
 	echo "Cloning ${tool}..."
-	if ! git clone -q -o adapteva -b ${branch} ${repo_url} ${tool} \
+	if ! git clone -q -b ${branch} ${repo_url} ${tool} \
 	         >> ${log} 2>&1
 	then
 	    echo "ERROR: Unable to clone ${tool}" | tee -a ${log}
@@ -180,8 +178,7 @@ download_tool() {
 # checking out the relevant branch.
 
 # @param[in] $1 The tool to clone (will appear as a subdirectory of ${topdir}.
-# @param[in] $2 The GitHub repo (within the adapteva organization) to
-#               clone/download.
+# @param[in] $2 The GitHub repo to clone/download.
 # @param[in] $3 The branch to checkout/download.
 # @param[in] $4 Github organization.
 
@@ -208,29 +205,23 @@ github_tool () {
 # @return 0 on success, anything else indicates failure
 download_components() {
     # Clone/Download repositories from GitHub
-    # TODO: ??? Move this to get-versions.sh
 
     OLD_IFS=${IFS}
     IFS="
 " # We only want the newline character
 
     res="ok"
-    for line in `cat ${basedir}/sdk/components.conf | grep -v '^#' \
-		     | grep -v '^$'`
+    for line in `grep -v -e '^#' -e '^$' ${basedir}/sdk/components.conf`
     do
-	class=`echo ${line} | cut -d ':' -f 1`
+        line=(${line//:/$IFS})
+	class=${line[0]}
 
 	case ${class} in
-	toolchain|sdk|parallella)
-	    tool=`   echo ${line} | cut -d ':' -f 2`
-	    branch=` echo ${line} | cut -d ':' -f 3`
-	    repo=`   echo ${line} | cut -d ':' -f 4`
-	    if [ "x${class}" = "xparallella" ]
-	    then
-		org="parallella"
-	    else
-		org="adapteva"
-	    fi
+	toolchain)
+	    tool=${line[1]}
+	    branch=${line[2]}
+	    repo=${line[3]}
+	    org=${line[4]}
 
 	    if ! github_tool "${tool}" "${repo}" "${branch}" "${org}"
 	    then
@@ -241,9 +232,9 @@ download_components() {
 	    ;;
 
 	gccinfra)
-	    name=`    echo ${line} | cut -d ':' -f 2`
-	    version=` echo ${line} | cut -d ':' -f 3`
-	    suffix=`  echo ${line} | cut -d ':' -f 4`
+	    name=${line[1]}
+	    version=${line[2]}
+	    suffix=${line[3]}
 
 	    if ! gcc_component ${name} ${version} ${suffix}
 	    then
@@ -254,11 +245,11 @@ download_components() {
 	    ;;
 
 	other)
-	    name=`    echo ${line} | cut -d ':' -f 2`
-	    version=` echo ${line} | cut -d ':' -f 3`
-	    suffix=`  echo ${line} | cut -d ':' -f 4`
-	    proto=`   echo ${line} | cut -d ':' -f 5`
-	    base=`    echo ${line} | cut -d ':' -f 6`
+	    name=${line[1]}
+	    version=${line[2]}
+	    suffix=${line[3]}
+	    proto=${line[4]}
+	    base=${line[5]}
 
 	    if ! other_component ${name} ${version} ${suffix} ${proto}:${base}
 	    then
@@ -269,8 +260,19 @@ download_components() {
 	    ;;
 
 	*)
-	    echo Ignoring ${class} ${tool}
+	    tool=${line[1]}
+	    branch=${line[2]}
+	    repo=${line[3]}
+	    org="${class}"
+
+	    if ! github_tool "${tool}" "${repo}" "${branch}" "${org}"
+	    then
+		res="fail"
+		break
+	    fi
+
 	    ;;
+
 	esac
 
 
@@ -284,7 +286,7 @@ download_components() {
 }
 
 
-# Function to download a GCC component
+# Function to download a GCC infrastructure component
 
 # @param[in] $1 Component name
 # @param[in] $2 File name with version

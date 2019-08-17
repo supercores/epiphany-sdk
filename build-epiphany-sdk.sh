@@ -22,14 +22,13 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Define the basedir
-d=`dirname "$0"`
-basedir=`(cd "$d/.." && pwd)`
+basedir="$(cd "$(dirname "$0")/.." && pwd)"
 
 # Common functions
-. ${basedir}/sdk/common-functions
+. "${basedir}/sdk/common-functions"
 
 # Set the release parameters
-. ${basedir}/sdk/define-release.sh
+. "${basedir}/sdk/define-release.sh"
 
 # Git branch or tag name for build default
 BRANCH=$(cd "${basedir}/sdk" \
@@ -112,16 +111,12 @@ while getopts c:e:Cdj:r:Rt:h arg; do
 done
 
 shift $((OPTIND-1))
-
-if [ "x${ESDK_BUILDROOT}" = "x" ]; then
-	d=$(dirname "$0")
-	ESDK_BUILDROOT=$(cd "$d/.." && pwd)
-fi
+ESDK_BUILDROOT="${ESDK_BUILDROOT:-${basedir}}"
 
 if [ "x${ESDK_DESTDIR}" = "x" ]; then
-	ESDK_DESTDIR="$(echo ${ESDK_BUILDROOT}/esdk.${RELEASE}/ | sed s,[/]*$,/,g)"
+	ESDK_DESTDIR="${ESDK_BUILDROOT}/esdk.${RELEASE}/"
 else
-	ESDK_DESTDIR="$(echo ${ESDK_DESTDIR}/ | sed s,[/]*$,/,g)"
+	ESDK_DESTDIR="${ESDK_DESTDIR%/}/"
 fi
 
 ESDK_PREFIX=/opt/adapteva
