@@ -31,15 +31,10 @@ basedir=`(cd "$d/.." && pwd)`
 # Set the release parameters
 . ${basedir}/sdk/define-release.sh
 
-BRANCH=""
-# Git branch name for build default
-if [ -e ${basedir}/sdk/.git ] && which git >/dev/null; then
-	BRANCH=$(cd ${basedir}/sdk && git rev-parse --abbrev-ref HEAD || true)
-fi
-
-if [ "x${BRANCH}" = "x" ]; then
-	BRANCH="master"
-fi
+# Git branch or tag name for build default
+BRANCH=$(cd "${basedir}/sdk" \
+    && git branch|sed -e '/^ /d' -e 's/.* //' -e 's/)$//' 2> /dev/null \
+    || echo master)
 
 # Host architecture triplet for toolchain
 # Likely value (with -c) if cross-building for Pubuntu is "arm-linux-gnueabihf"
