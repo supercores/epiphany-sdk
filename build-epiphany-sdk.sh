@@ -300,6 +300,29 @@ then
 	exit 1
 fi
 
+# Build openshmem
+if check_dir_exists "openshmem/src"
+then
+    printf "Building openshmem...\n"
+    logfile=${LOGDIR}/build-openshmem-$(date -u +%F-%H%M).log
+    E_ELF_DIR="${ESDK_DESTDIR%/}${GNU}/epiphany-elf"
+    cd ${basedir}/openshmem/src
+    if ! make -f Makefile.esdk CFLAGS="-I${E_ELF_DIR}/include" >> "${logfile}" 2>&1
+    then
+	    printf "The openshmem build failed!\n"
+	    printf "\nAborting...\n"
+	    exit 1
+    fi
+    if ! make -f Makefile.esdk install DESTDIR="${E_ELF_DIR}" >> "${logfile}" 2>&1
+    then
+	    printf "The openshmem install failed!\n"
+	    printf "\nAborting...\n"
+	    exit 1
+    fi
+    make -f Makefile.esdk distclean >> "${logfile}" 2>&1
+    cd - > /dev/null 2>&1
+fi
+
 # Copy top files
 echo "Copying top files"
 cp -d README    ${ESDK_DESTDIR}${ESDK}
