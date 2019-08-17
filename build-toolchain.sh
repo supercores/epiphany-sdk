@@ -324,13 +324,14 @@ load=
 
 # The assembler and/or linker are broken so that constant merging doesn't
 # work.
-CFLAGS_FOR_TARGET=${CFLAGS_FOR_TARGET:-"-O2 -g"}
-CXXFLAGS_FOR_TARGET=${CXXFLAGS_FOR_TARGET:-"-O2 -g"}
-CFLAGS=${CFLAGS:-"-O2 -g"}
-CXXFLAGS=${CXXFLAGS:-"-O2 -g"}
+gcc_options="-O2 -g -fPIC"
+CFLAGS_FOR_TARGET=${CFLAGS_FOR_TARGET:-${gcc_options}}
+CXXFLAGS_FOR_TARGET=${CXXFLAGS_FOR_TARGET:-${gcc_options}}
+CFLAGS=${CFLAGS:-${gcc_options}}
+CXXFLAGS=${CXXFLAGS:-${gcc_options}}
+
 config_extra=""
 disable_werror="--disable-werror"
-
 
 until
 opt=$1
@@ -781,8 +782,8 @@ then
 	OLD_CXXFLAGS_FOR_TARGET=${CXXFLAGS_FOR_TARGET}
 	CXXFLAGS_FOR_TARGET=
 	if ! "${unisrc_dir}/configure" \
-	    CFLAGS="${CFLAGS} -fPIC" \
-	    CXXFLAGS="${CXXFLAGS} -fPIC" \
+	    CFLAGS="${CFLAGS} ${gcc_options}" \
+	    CXXFLAGS="${CXXFLAGS} ${gcc_options}" \
 	    --target=epiphany-elf \
 	    --with-pkgversion="Epiphany toolchain ${RELEASE}" \
 	    --with-bugurl=support-sdk@adapteva.com \
@@ -928,8 +929,8 @@ then
     if ! "${unisrc_dir}/configure" \
 	CFLAGS_FOR_TARGET="${CFLAGS_FOR_TARGET}" \
 	CXXFLAGS_FOR_TARGET="${CXXFLAGS_FOR_TARGET}" \
-	CFLAGS="${CFLAGS} -fPIC" \
-	CXXFLAGS="${CXXFLAGS} -fPIC" \
+	CFLAGS="${CFLAGS} ${gcc_options}" \
+	CXXFLAGS="${CXXFLAGS} ${gcc_options}" \
 	--target=epiphany-elf ${host_str} \
 	--with-pkgversion="Epiphany toolchain ${RELEASE}" \
 	--with-bugurl=support-sdk@adapteva.com \
