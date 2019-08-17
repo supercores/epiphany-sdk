@@ -1,3 +1,2 @@
 #!/bin/sh
 sdk/build-epiphany-sdk.sh -c arm-linux-gnueabihf $@
-
