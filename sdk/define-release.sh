@@ -40,9 +40,9 @@
 # Epiphany releases have the naming convention:
 
 #   <year>.<month>[.<patch>]
-RELEASE_MAJOR="2016"
-RELEASE_MINOR="11"
-RELEASE_PATCH=""
+RELEASE_MAJOR="2019"
+RELEASE_MINOR="8"
+RELEASE_PATCH=".gcc5"
 
 # The full release version
 RELEASE="${RELEASE_MAJOR}.${RELEASE_MINOR}${RELEASE_PATCH}"
