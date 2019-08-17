@@ -182,10 +182,17 @@ do
 
     # Ignore tools that are not in git repos. If you have renamed .git or have
     # a non-git repo with a directory of that name, we presume you are an
-    # expert who ca sort out the ensuing chaos!
+    # expert who can sort out the ensuing chaos!
     if ! [ -d ".git" ]
     then
 	continue
+    fi
+
+    # If not behind origin continue
+    if git branch|grep -q "\* .*${branch}" && \
+       [ "$(git rev-list --count ..${branch}@{upstream} 2>&1)" = "0" ]
+    then
+	    continue
     fi
 
     if [ "x${autopull}" = "x--auto-pull" ]
