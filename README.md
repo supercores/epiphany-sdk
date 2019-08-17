@@ -1,50 +1,45 @@
-Epiphany SDK Build and Install Package
-======================================
+# Epiphany SDK Build and Install Package
 
-[![Build Status](https://travis-ci.org/adapteva/epiphany-sdk.svg?branch=master)](https://travis-ci.org/adapteva/epiphany-sdk)
+[![Build Status](https://travis-ci.org/supercores/epiphany-sdk.svg?branch=2019.8.gcc5)](https://travis-ci.org/supercores/epiphany-sdk)
+[![Build Status](https://travis-ci.org/supercores/epiphany-sdk.svg?branch=2019.8.gcc8)](https://travis-ci.org/supercores/epiphany-sdk)
 
----
+## Start Here
 
-##NOTE
+This repository is the main poject for building and installing
+the Epiphany SDK toolchain.
 
-This repository is the development repo. containing the latest code
-changes. It may not build, and if it does, it may not work correctly.
+Check out the release branch to build.
 
-The latest release repo is located at:  
-https://github.com/adapteva/epiphany-sdk/tree/2016.3
+To cross compile execute:
 
-To download the latest release repo:  
-https://github.com/adapteva/epiphany-sdk/archive/esdk-2016.3.tar.gz
+```
+sdk/build-epiphany-sdk.sh -c arm-linux-gnueabihf
+```
 
-To download the latest SDK release:  
-ftp://ftp.parallella.org/esdk/
+## Release information
 
----
+Releases are versioned according to the following abstraction with unique
+branches created per release.
 
+ * MAJOR version = the current year
+ * MINOR version = the current month
+ * PATCH version = for multiple releases per month (if required)
+ * GCC version   = the gcc major version (currently support gcc5 and gcc8)
 
-This directory is the main poject for building and installing
-the Epiphany SDK components. When invoked, it creates the eSDK release
-installation node and copies the various modules into that node.
+To build a specefic release checkout the particular branch.
 
-It is required to build the Epiphany GNU Tools package (epiphany-gcc,
-epiphany-sourceware) before building this eSDK package.
-
-
----
-
-##DISCLAIMER
+## Disclaimer
 
 This package is still in development process. There is no guarantee for
 backward compatibility of future releases.
 
----
-
-##Copyright note:
+## Copyright note:
 
 This file is part of the Epiphany Software Development Kit.
 
-Copyright (C) 2013 Adapteva, Inc.
-Contributed by Yaniv Sapir <support@adapteva.com>
+Copyright (C) 2019 SuperCores project.  
+Copyright (C) 2013 Adapteva, Inc.  
+Contributed by Yaniv Sapir <support@adapteva.com>  
 
 This package is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License (or the GNU
