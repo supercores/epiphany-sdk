@@ -103,10 +103,8 @@ clone_tool() {
     fi
 
     # Clone git repository if it does not already exist
-    if [ -e ${tool} ]
+    if [ ! -e ${tool} ]
     then
-	echo "${tool} already cloned." | tee -a ${log}
-    else
 	echo "Cloning ${tool}..."
 	if ! git clone -q -o adapteva -b ${branch} ${repo_url} ${tool} \
 	         >> ${log} 2>&1
@@ -144,10 +142,8 @@ download_tool() {
     fi
 
     # Download and unpack source if it does not already exist
-    if [ -e ${tool} ]
+    if [ ! -e ${tool} ]
     then
-	echo "${tool} already downloaded." | tee -a ${log}
-    else
 	echo "Downloading ${tool}..."
 	if ! wget ${archive_url}/${branch} \
 	    >> ${log} 2>&1
@@ -300,14 +296,7 @@ gcc_component () {
     file=$2
     packed_name=${file}.$3
 
-    if ! mkdir -p gcc-infrastructure
-    then
-	echo "ERROR: Unable to create gcc-infrastructure directory" \
-	    | tee -a ${log}
-	exit 1
-    fi
-
-    cd gcc-infrastructure
+    mkdir -p gcc-infrastructure; cd gcc-infrastructure
     download_tool "${tool}" "${infra_url}" "tar xf" "${packed_name}" "${file}"
     cd ..
 }
@@ -327,14 +316,7 @@ other_component () {
     packed_name=${file}.$3
     url=$4
 
-    if ! mkdir -p gcc-infrastructure
-    then
-	echo "ERROR: Unable to create gcc-infrastructure directory" \
-	    | tee -a ${log}
-	exit 1
-    fi
-
-    cd gcc-infrastructure
+    mkdir -p gcc-infrastructure; cd gcc-infrastructure
     download_tool "${tool}" "${url}" "tar xf" "${packed_name}" "${file}"
     cd ..
 }
@@ -443,13 +425,8 @@ done
 
 # Move to basedir location
 
-d=`dirname "$0"`
-basedir=`(cd "$d/.." && pwd)`
-if ! cd "${basedir}"
-then
-    echo "ERROR: Unable to change to base directory for downloads/clones"
-    exit 1
-fi
+basedir="$(cd "$(dirname "$0")/.." && pwd)"
+cd "${basedir}"
 
 # Set the release parameters
 . ${basedir}/sdk/define-release.sh

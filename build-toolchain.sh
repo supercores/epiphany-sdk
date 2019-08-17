@@ -702,18 +702,14 @@ fi
 # Blow away the unified source directory if requested
 if [ "${rebuild_unisrc}" = "--rebuild-unisrc" ]
 then
-    rm -rf "${unisrc_dir}" >> ${logfile} 2>&1
+    rm -rf "${unisrc_dir}"
 fi
 
 # Create unified source directory if it doesn't exist
 if ! [ -d "${unisrc_dir}" ]
 then
   # Create a unified source directory
-  if ! mkdir "${unisrc_dir}" >> ${logfile} 2>&1
-  then
-      logterm "ERROR: Could not create unified source dir ${unisrc_dir}."
-      failedbuild
-  fi
+  mkdir -p "${unisrc_dir}"
 
   logterm "Creating unified source tree..."
   if ! ${basedir}/sdk/symlink-all.sh "${basedir}" "${logfile}" \
@@ -736,12 +732,7 @@ fi
 
 
 # Ensure the staging directory exists.
-if ! mkdir -p "$staging_host"
-then
-    logterm "ERROR: Failed to create staging directory ${staging_host}."
-    failedbuild
-fi
-
+mkdir -p "$staging_host"
 
 ################################################################################
 #                                                                              #
@@ -768,18 +759,7 @@ then
 	# trying to preserve previous builds. If we get here, by definition
 	# they were no good.
 	rm -rf "${bd_build}"
-	if ! mkdir -p "${bd_build}"
-	then
-	    logterm "ERROR: Failed to create build directory ${bd_build}."
-	    failedbuild
-	fi
-
-        # Change to the build directory
-	if ! cd ${bd_build}
-	then
-	    logterm "ERROR: Could not change to build directory ${bd_build}."
-	    failedbuild
-	fi
+        mkdir -p "${bd_build}"; cd ${bd_build}
 
 	# Force guile 1.8 in build if available.
 	guile18=`which guile1.8 2>/dev/null`
@@ -850,17 +830,8 @@ then
     if check_dir_exists "gcc-infrastructure/ncurses"
     then
 	bd_ncurses="${bd_host}-ncurses"
-	rm -rf "${bd_ncurses}"
-	if ! mkdir -p "${bd_ncurses}"
+        mkdir -p "${bd_ncurses}"; cd "${bd_ncurses}"
 	then
-	    logterm "ERROR: Failed to create ncurses build directory."
-	fi
-
-	if ! cd "${bd_ncurses}"; then
-	    logterm "ERROR: Could not change to build directory ${bd_ncurses}."
-	    failedbuild
-	fi
-
 	logterm "Building ncurses for host..."
 	if ! "${unisrc_dir}/ncurses/configure" ${host_str} --prefix="${staging_host}" \
 	    --without-progs --without-ada --without-manpages --without-tests \
@@ -871,7 +842,6 @@ then
 	    logterm "ERROR: Unable to configure ncurses for host"
 	    failedbuild
 	fi
-
 	if ! make ${parallel} >> "${logfile}" 2>&1
 	then
 	    logterm "ERROR: Unable to build ncurses for host"
@@ -890,16 +860,7 @@ then
     if check_dir_exists "gcc-infrastructure/expat"
     then
 	bd_expat="${bd_host}-expat"
-	rm -rf "${bd_expat}"
-	if ! mkdir -p "${bd_expat}"
-	then
-	    logterm "ERROR: Failed to create expat build directory."
-	fi
-
-	if ! cd "${bd_expat}"; then
-	    logterm "ERROR: Could not change to build directory ${bd_expat}."
-	    failedbuild
-	fi
+    mkdir -p "${bd_expat}"; cd "${bd_expat}"
 
 	logterm "Building expat for host..."
 	if ! "${unisrc_dir}/expat/configure" ${host_str} --prefix="${staging_host}" \
@@ -934,7 +895,6 @@ then
     export LDFLAGS
 fi
 
-
 ################################################################################
 #                                                                              #
 #	       Configure, build and install the host tool chain                #
@@ -942,18 +902,7 @@ fi
 ################################################################################
 
 # Ensure the build directory exists. We build in the host build directory.
-if ! mkdir -p "${bd_host}"
-then
-    logterm "ERROR: Failed to create build directory ${bd_host}."
-    failedbuild
-fi
-
-# Change to the build directory
-if ! cd ${bd_host}
-then
-    logterm "ERROR: Could not change to build directory ${bd_host}."
-    failedbuild
-fi
+mkdir -p "${bd_host}"; cd "${bd_host}"
 
 # Force guile 1.8 in build if available.
 guile18=`which guile1.8 2>/dev/null`
@@ -1013,14 +962,12 @@ then
   failedbuild
 fi
 
-
 # If the toolchain was built for this arch we can now use it
 if [ "x${host_arch}" = "x${build_arch}" ]
 then
     PATH=${destdir}${id_host}/bin:$PATH
     export PATH
 fi
-
 
 ################################################################################
 #                                                                              #
@@ -1033,11 +980,7 @@ fi
 # pages.
 logterm "Creating symbolic links for tools"
 
-if ! cd "${destdir}${id_host}/bin"
-then
-    logterm "ERROR: Unable to select bin directory in ${destdir}${id_host}"
-    failedbuild
-fi
+cd "${destdir}${id_host}/bin"
 
 for executable in epiphany-elf-*
 do
@@ -1050,12 +993,8 @@ do
 done
 
 logterm "Creating symbolic links for man pages"
-
-if ! cd "${destdir}${id_host}/share/man/man1"
-then
-    logterm "ERROR: Unable to select share/man/man1 directory in ${destdir}${id_host}"
-    failedbuild
-fi
+mandir="${destdir}${id_host}/share/man/man1"
+mkdir -p "${mandir}"; cd "${mandir}"
 
 for manpage in epiphany-elf-*
 do
