@@ -5,23 +5,14 @@ cache:
     ccache: true
     apt: true
     directories:
-        - sdk/gcc
-        - sdk/binutils
-        - sdk/cgen
-        - sdk/epiphany-libs
-        - sdk/gcc
-        - sdk/gcc-infrastructure
-        - sdk/gdb
-        - sdk/newlib
+        - gcc-infrastructure
 
 language: c
 
 before_install:
-    - sudo apt-get update -qq
-    - sudo apt-get upgrade -qq -o Dpkg::Options::="--force-confnew"
-    - sudo apt-get install -qq -o Dpkg::Options::="--force-confnew"
+    - sudo apt-get install -qq
       build-essential
-    - sudo apt-get install -qq -o Dpkg::Options::="--force-confnew"
+    - sudo apt-get install -qq
       bison
       flex
       g++-arm-linux-gnueabihf
@@ -33,12 +24,8 @@ before_install:
       locate
       texinfo
       wget
-      xzip
-      lzip
-      zip
-      guile-1.8
 
 script:
     - ./sdk/download-components.sh --download
-    - ./sdk/.travis.sh
+    - ./.travis.sh
 
