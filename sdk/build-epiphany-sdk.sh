@@ -325,10 +325,10 @@ fi
 
 # Copy top files
 echo "Copying top files"
-cp -d README    ${ESDK_DESTDIR}${ESDK}
-cp -d COPYING   ${ESDK_DESTDIR}${ESDK}
-cp -d setup.sh  ${ESDK_DESTDIR}${ESDK}
-cp -d setup.csh ${ESDK_DESTDIR}${ESDK}
+cp -d "${basedir}/README"  ${ESDK_DESTDIR}${ESDK}
+cp -d "${basedir}/COPYING" ${ESDK_DESTDIR}${ESDK}
+cp -d "${basedir}/sdk/setup.sh"  ${ESDK_DESTDIR}${ESDK}
+cp -d "${basedir}/sdk/setup.csh" ${ESDK_DESTDIR}${ESDK}
 
 echo "Creating tarball"
 tar czf ${ESDK_BUILDROOT}/esdk.${RELEASE}.tar.gz -C ${ESDK_DESTDIR}${ESDK_PREFIX} esdk.${RELEASE}
